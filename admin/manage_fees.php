@@ -1,0 +1,171 @@
+<?php
+
+
+  include('admin_session.php');
+  include('functions.php');
+  require('includes/connection.php');
+
+  $blankInputErr="";
+
+   if(isset($_GET['course_id'])){
+     $the_course_id = validateFormData($_GET['course_id']);
+
+   }
+
+                  $query = "SELECT tbl_tuition_fee.course_id,
+                            tbl_tuition_fee.tuition_fee, 
+                            tbl_tuition_fee.lecture_fee , 
+                            tbl_tuition_fee.laboratory_fee , 
+                            tbl_tuition_fee.registration_fee , 
+                            tbl_tuition_fee.misc_fee 
+                            FROM icc_prac3.tbl_tuition_fee 
+                            WHERE tbl_tuition_fee.course_id = '$the_course_id'"; 
+                            
+
+                  $result = mysqli_query($conn, $query);
+
+                 while($row = mysqli_fetch_assoc($result)){
+
+                      $tuition_fee = $row['tuition_fee'];
+                      $lecture_fee = $row['lecture_fee'];
+                      $laboratory_fee = $row['laboratory_fee']; 
+                      $registration_fee = $row['registration_fee'];
+                      $misc_fee = $row['misc_fee'];
+                    
+
+                  } 
+
+    if( isset($_POST['btn_submit']) ){
+
+
+      $tuition_fee = validateFormData($_POST['tuition_fee']);
+      $lecture_fee = validateFormData($_POST['lecture_fee']);
+      $laboratory_fee = validateFormData($_POST['laboratory_fee']);
+      $registration_fee = validateFormData($_POST['registration_fee']);
+      $misc_fee = validateFormData($_POST['misc_fee']);
+
+
+      $query = "UPDATE icc_prac3.tbl_tuition_fee
+                SET tbl_tuition_fee.tuition_fee = '$tuition_fee',
+                tbl_tuition_fee.lecture_fee = '$lecture_fee',
+                tbl_tuition_fee.misc_fee = '$misc_fee',
+                tbl_tuition_fee.laboratory_fee = '$laboratory_fee',
+                tbl_tuition_fee.registration_fee ='$registration_fee'
+                WHERE tbl_tuition_fee.course_id = '$the_course_id'";
+
+      $result = mysqli_query($conn,$query);
+
+      if( !$result ){
+        $blankInputErr = "<div class='row'><div class='col-md-12 col-md-offset-1'><div class='alert alert-danger'>
+                                      <strong> NO CHANGES DONE <a class='close' data-dismiss='alert'>&times</a> </strong> 
+                                  </div></div></div>";
+      } else {
+        header('Location:manage_fees_choose_course.php?alert=success');
+      }
+
+    } /*update end script*/
+
+    mysqli_close($conn);
+
+    include('includes/header.php');
+    include('navigation_admin2.php');
+?>
+                             
+       <div class="container" id="mainContainer">
+
+            <div class="container ">
+                <div class="row">
+                    <div class="col-md-12"> 
+                        <ol class="breadcrumb">
+                            <li><a href="administration.php">Administration</a></li>
+                            <li class="active"><a href="manage_fees_choose_course.php">Choose Course</a></li>
+                            <li class="active"><a href="manage_fees_choose_course.php">Manage Fees</a></li>
+                            
+                        </ol> 
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <?php include('admin_nav2.php'); ?>
+                   
+                        <!--profile content here-->
+                        <div class="container-fluid">
+                         <?php echo $blankInputErr;?>
+                            <form class="form-horizontal" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']);?>?course_id=<?php {echo $the_course_id;} ?>" method="post" >
+                              <div class="panel panel-success">
+                                <div class="panel-heading"> Edit Fees for <?php echo $the_course_id; ?> </div>
+
+                                <div class="panel-body">
+                                <!-- Text input-->
+                                <div class="form-group">
+                                  <label class="col-md-4 control-label" for="" >Tuition Fee:</label>  
+                                  <div class="col-md-4">
+                                  <input  name="tuition_fee" type="text" placeholder="Tuiition Fee"  class="form-control input-md"  value='<?php echo $tuition_fee;?>'>
+                                    
+                                  </div>
+                                </div>
+
+                                <!-- Text input-->
+                                <div class="form-group">
+                                  <label class="col-md-4 control-label" for="last_name">Lecture Fee :</label>  
+                                  <div class="col-md-6">
+                                  <input  name="lecture_fee" type="text" placeholder="Lecture Fee" class="form-control input-md" value='<?php echo $lecture_fee; ?>'>
+                                    
+                                  </div>
+                                </div>
+
+
+                                <!-- Text input-->
+                                <div class="form-group">
+                                  <label class="col-md-4 control-label" for="last_name">Laboratory :</label>  
+                                  <div class="col-md-4">
+                                  <input  name="laboratory_fee" type="text" placeholder="Laboratory Fee" class="form-control input-md" value='<?php echo 
+
+$laboratory_fee; ?>'>
+                                    
+                                  </div>
+                                </div>
+
+                                <!-- Text input-->
+                                <div class="form-group">
+                                   
+                                  <label class="col-md-4 control-label" for="laboratory_fee">Registration Fee :</label>  
+                                  <div class="col-md-4">
+                                  <input  name="registration_fee" type="text" placeholder="Registration Fee" class="form-control input-md" value='<?php echo 
+
+$registration_fee; ?>'>
+                                    
+                                  </div>
+                                </div>
+
+                                <!-- Text input-->
+                                <div class="form-group">
+                                  <label class="col-md-4 control-label" for="student_address">Miscellaneous Fee :</label>  
+                                  <div class="col-md-4">
+                                  <input name="misc_fee" type="text" placeholder="Miscellaneous Fee" class="form-control input-md" value='<?php echo $misc_fee; ?>'>
+                                    
+                                  </div>
+                                </div>
+
+
+                              </div> <!--panel body ending-->
+                            <!-- Button (Double) -->
+                                  <div class="panel-footer">
+                                      <div class="form-group">
+                                        <label class="col-md-4 control-label" ></label>
+                                        <div class="col-md-8">
+                                          <input type="submit" name="btn_submit" class="btn btn-success" style="margin-left: 185px;">
+                                          <button id="btn_cancel" name="btn_cancel" class="btn btn-default">Cancel</button>
+                                        </div>
+                                      </div>
+                                  </div>
+                              </div>
+                            </form>
+                        </div>
+                    
+                    </div>
+                </div>
+            </div> <!-- end of admission container-->
+    </div><!--end of main -->
+    
+<?php include('includes/footer.php'); ?>
